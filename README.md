@@ -74,57 +74,8 @@ make run    # Scan this repository
 
 ## Example Output
 
-```
-RepoXray Repository Health Report
-=================================
+<img width="867" height="563" alt="image" src="https://github.com/user-attachments/assets/a242ee24-0df7-474e-b670-b66d262a0072" />
 
-Summary
--------
-Total checks: 16
-Repository: .
-Passed: 16, Warned: 0, Failed: 0
-
-Score
------
-Maturity Score: 100/100
-Rating: Excellent
-
-Strengths
----------
-[PASS] README.md exists
-[PASS] License file exists: LICENSE
-[PASS] CONTRIBUTING.md exists
-[PASS] CODE_OF_CONDUCT.md exists
-[PASS] SECURITY.md exists
-[PASS] CI workflows exist: 2 workflow file(s)
-[PASS] Workflow permissions are explicitly configured
-[PASS] Workflow write-all permissions are not used
-[PASS] GitHub Actions references are pinned by version, tag, or SHA
-[PASS] pull_request_target is not used in workflows
-[PASS] Secrets are not referenced from pull_request_target workflows
-[PASS] Issue templates exist
-[PASS] Pull request template exists
-[PASS] Package files exist
-[PASS] Tests exist
-[PASS] .git directory exists
-
-Warnings
---------
-No warnings.
-
-Critical Issues
----------------
-No critical issues found.
-
-Recommendations
----------------
-No recommendations. Repository looks healthy.
-```
-
-More examples are available in:
-
-- [Local repository scan](docs/examples/local-scan.md)
-- [Public GitHub repository scan](docs/examples/github-scan.md)
 
 ## Roadmap
 
