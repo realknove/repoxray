@@ -68,12 +68,12 @@ type Check interface {
 }
 
 type Result struct {
-	ID             string
-	Title          string
-	Description    string
-	Status         Status
-	Message        string
-	Points         int
-	MaxPoints      int
-	Recommendation string
+	ID             string `json:"id"`
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	Status         Status `json:"status"`
+	Message        string `json:"message"`
+	Points         int    `json:"points"`
+	MaxPoints      int    `json:"max_points"`
+	Recommendation string `json:"recommendation,omitempty"`
 }

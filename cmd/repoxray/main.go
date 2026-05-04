@@ -27,12 +27,12 @@ func main() {
 
 	switch command {
 	case "scan":
-		if len(args) < 2 {
-			fmt.Println("Error: scan command requires a path")
+		repoPath, outputFormat, err := parseScanArgs(args[1:])
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
 		}
-		repoPath := args[1]
-		scanRepo(repoPath)
+		scanRepo(repoPath, outputFormat)
 	case "version":
 		fmt.Printf("RepoXray version %s\n", version)
 	case "help":
@@ -44,9 +44,48 @@ func main() {
 	}
 }
 
-func scanRepo(repoPath string) {
+func parseScanArgs(args []string) (string, report.Format, error) {
+	outputFormat := report.TextFormat
+	repoPath := ""
+
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		switch {
+		case arg == "--format":
+			if i+1 >= len(args) {
+				return "", "", fmt.Errorf("--format requires a value")
+			}
+			parsed, err := report.ParseFormat(args[i+1])
+			if err != nil {
+				return "", "", err
+			}
+			outputFormat = parsed
+			i++
+		case strings.HasPrefix(arg, "--format="):
+			parsed, err := report.ParseFormat(strings.TrimPrefix(arg, "--format="))
+			if err != nil {
+				return "", "", err
+			}
+			outputFormat = parsed
+		case strings.HasPrefix(arg, "-"):
+			return "", "", fmt.Errorf("unknown scan option %q", arg)
+		case repoPath == "":
+			repoPath = arg
+		default:
+			return "", "", fmt.Errorf("scan accepts only one path")
+		}
+	}
+
+	if repoPath == "" {
+		return "", "", fmt.Errorf("scan command requires a path")
+	}
+
+	return repoPath, outputFormat, nil
+}
+
+func scanRepo(repoPath string, outputFormat report.Format) {
 	if _, err := os.Stat(repoPath); err == nil {
-		scanLocalRepo(repoPath, repoPath)
+		scanLocalRepo(repoPath, repoPath, outputFormat)
 		return
 	} else if !os.IsNotExist(err) {
 		fmt.Printf("Error: cannot access path '%s': %v\n", repoPath, err)
@@ -66,10 +105,10 @@ func scanRepo(repoPath string) {
 	}
 	defer os.RemoveAll(tempDir)
 
-	scanLocalRepo(tempDir, repo.DisplayName())
+	scanLocalRepo(tempDir, repo.DisplayName(), outputFormat)
 }
 
-func scanLocalRepo(repoPath, displayPath string) {
+func scanLocalRepo(repoPath, displayPath string, outputFormat report.Format) {
 	// Check if path exists
 	if _, err := os.Stat(repoPath); os.IsNotExist(err) {
 		fmt.Printf("Error: path '%s' does not exist\n", repoPath)
@@ -79,17 +118,22 @@ func scanLocalRepo(repoPath, displayPath string) {
 	// Check if it's a git repo
 	gitPath := filepath.Join(repoPath, ".git")
 	if _, err := os.Stat(gitPath); os.IsNotExist(err) {
-		fmt.Println("Warning: .git directory not found. This may not be a Git repository.")
+		fmt.Fprintln(os.Stderr, "Warning: .git directory not found. This may not be a Git repository.")
 	}
 
 	// Scan
 	results := scan.Scan(repoPath)
 
 	// Calculate score
-	maturityScore := score.CalculateScore(results)
+	scoreAnalysis := score.Analyze(results)
 
 	// Report
-	report.RenderReport(results, maturityScore, displayPath)
+	output, err := report.Render(results, scoreAnalysis, displayPath, outputFormat)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Print(output)
 }
 
 type githubRepo struct {
@@ -182,12 +226,14 @@ func printHelp() {
 	fmt.Println("RepoXray - Repository Health Analyzer")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  repoxray scan <path|owner/name|github.com/owner/name>    Scan a local or public GitHub repository")
+	fmt.Println("  repoxray scan <path|owner/name|github.com/owner/name> [--format text|json|markdown]")
 	fmt.Println("  repoxray version                                   Print version information")
 	fmt.Println("  repoxray help                                      Print this help message")
 	fmt.Println()
 	fmt.Println("Examples:")
 	fmt.Println("  repoxray scan .")
+	fmt.Println("  repoxray scan . --format json")
+	fmt.Println("  repoxray scan . --format markdown")
 	fmt.Println("  repoxray scan /path/to/repo")
 	fmt.Println("  repoxray scan biomejs/biome")
 	fmt.Println("  repoxray scan github.com/biomejs/biome")
