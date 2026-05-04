@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"repoxray/internal/score"
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/score"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 type Format string

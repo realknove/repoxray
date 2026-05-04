@@ -8,17 +8,20 @@ import (
 	"path/filepath"
 	"strings"
 
-	"repoxray/internal/report"
-	"repoxray/internal/scan"
-	"repoxray/internal/score"
+	"github.com/realknove/repoxray/internal/report"
+	"github.com/realknove/repoxray/internal/scan"
+	"github.com/realknove/repoxray/internal/score"
 )
 
-const version = "0.1.0"
+const (
+	appName = "RepoXray"
+	version = "0.1.0"
+)
 
 func main() {
 	args := os.Args[1:]
 
-	if len(args) == 0 {
+	if len(args) == 0 || isHelpArg(args[0]) {
 		printHelp()
 		return
 	}
@@ -27,21 +30,30 @@ func main() {
 
 	switch command {
 	case "scan":
+		if len(args) > 1 && isHelpArg(args[1]) {
+			printScanHelp()
+			return
+		}
 		repoPath, outputFormat, err := parseScanArgs(args[1:])
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error: %v\n\n", err)
+			printScanHelp()
 			os.Exit(1)
 		}
 		scanRepo(repoPath, outputFormat)
 	case "version":
-		fmt.Printf("RepoXray version %s\n", version)
+		fmt.Printf("%s version %s\n", appName, version)
 	case "help":
 		printHelp()
 	default:
-		fmt.Printf("Unknown command: %s\n", command)
+		fmt.Fprintf(os.Stderr, "Unknown command: %s\n\n", command)
 		printHelp()
 		os.Exit(1)
 	}
+}
+
+func isHelpArg(arg string) bool {
+	return arg == "-h" || arg == "--help"
 }
 
 func parseScanArgs(args []string) (string, report.Format, error) {
@@ -88,19 +100,19 @@ func scanRepo(repoPath string, outputFormat report.Format) {
 		scanLocalRepo(repoPath, repoPath, outputFormat)
 		return
 	} else if !os.IsNotExist(err) {
-		fmt.Printf("Error: cannot access path '%s': %v\n", repoPath, err)
+		fmt.Fprintf(os.Stderr, "Error: cannot access path '%s': %v\n", repoPath, err)
 		os.Exit(1)
 	}
 
 	repo, ok := parseGitHubRepo(repoPath)
 	if !ok {
-		fmt.Printf("Error: path '%s' does not exist\n", repoPath)
+		fmt.Fprintf(os.Stderr, "Error: path '%s' does not exist\n", repoPath)
 		os.Exit(1)
 	}
 
 	tempDir, err := cloneGitHubRepo(repo)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 	defer os.RemoveAll(tempDir)
@@ -111,7 +123,7 @@ func scanRepo(repoPath string, outputFormat report.Format) {
 func scanLocalRepo(repoPath, displayPath string, outputFormat report.Format) {
 	// Check if path exists
 	if _, err := os.Stat(repoPath); os.IsNotExist(err) {
-		fmt.Printf("Error: path '%s' does not exist\n", repoPath)
+		fmt.Fprintf(os.Stderr, "Error: path '%s' does not exist\n", repoPath)
 		os.Exit(1)
 	}
 
@@ -130,7 +142,7 @@ func scanLocalRepo(repoPath, displayPath string, outputFormat report.Format) {
 	// Report
 	output, err := report.Render(results, scoreAnalysis, displayPath, outputFormat)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 	fmt.Print(output)
@@ -223,18 +235,41 @@ func cloneGitHubRepo(repo githubRepo) (string, error) {
 }
 
 func printHelp() {
-	fmt.Println("RepoXray - Repository Health Analyzer")
+	fmt.Printf("%s - Repository Health Analyzer\n", appName)
+	fmt.Printf("Version: %s\n", version)
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  repoxray scan <path|owner/name|github.com/owner/name> [--format text|json|markdown]")
-	fmt.Println("  repoxray version                                   Print version information")
-	fmt.Println("  repoxray help                                      Print this help message")
+	fmt.Println("  repoxray <command> [options]")
+	fmt.Println()
+	fmt.Println("Commands:")
+	fmt.Println("  scan       Analyze a local repository or public GitHub repository")
+	fmt.Println("  version    Print version information")
+	fmt.Println("  help       Print this help message")
 	fmt.Println()
 	fmt.Println("Examples:")
 	fmt.Println("  repoxray scan .")
 	fmt.Println("  repoxray scan . --format json")
 	fmt.Println("  repoxray scan . --format markdown")
-	fmt.Println("  repoxray scan /path/to/repo")
 	fmt.Println("  repoxray scan biomejs/biome")
 	fmt.Println("  repoxray scan github.com/biomejs/biome")
+	fmt.Println()
+	fmt.Println("Run 'repoxray scan --help' for scan options.")
+}
+
+func printScanHelp() {
+	fmt.Println("Usage:")
+	fmt.Println("  repoxray scan <path|owner/name|github.com/owner/name> [--format text|json|markdown]")
+	fmt.Println()
+	fmt.Println("Arguments:")
+	fmt.Println("  path       Local repository path, GitHub owner/name, or github.com/owner/name")
+	fmt.Println()
+	fmt.Println("Options:")
+	fmt.Println("  --format   Output format: text, json, or markdown (default: text)")
+	fmt.Println("  -h, --help Print this help message")
+	fmt.Println()
+	fmt.Println("Examples:")
+	fmt.Println("  repoxray scan .")
+	fmt.Println("  repoxray scan /path/to/repo --format text")
+	fmt.Println("  repoxray scan biomejs/biome --format json")
+	fmt.Println("  repoxray scan github.com/biomejs/biome --format markdown")
 }

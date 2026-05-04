@@ -1,9 +1,9 @@
 package checks
 
 import (
+	"github.com/realknove/repoxray/internal/types"
 	"os"
 	"path/filepath"
-	"repoxray/internal/types"
 	"testing"
 )
 

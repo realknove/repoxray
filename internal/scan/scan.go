@@ -4,8 +4,8 @@ import (
 	"io/fs"
 	"path/filepath"
 
-	"repoxray/internal/checks"
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/checks"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 // Scan runs all checks on the repository at repoPath

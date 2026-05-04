@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"repoxray/internal/score"
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/score"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 func TestRating(t *testing.T) {

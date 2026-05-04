@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 type stubCheck struct {

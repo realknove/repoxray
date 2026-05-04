@@ -1,6 +1,6 @@
 # RepoXray
 
-[![CI](https://github.com/yourusername/repoxray/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/repoxray/actions/workflows/ci.yml)
+[![CI](https://github.com/realknove/repoxray/actions/workflows/ci.yml/badge.svg)](https://github.com/realknove/repoxray/actions/workflows/ci.yml)
 [![Go](https://img.shields.io/badge/go-1.21+-00ADD8?logo=go&logoColor=white)](https://go.dev/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Project Status](https://img.shields.io/badge/status-early--stage-blue)](#roadmap)
@@ -11,11 +11,24 @@ RepoXray favors simple, explainable checks over opaque scoring. It is useful for
 
 ## Installation
 
+### Go Install
+
+```bash
+go install github.com/realknove/repoxray/cmd/repoxray@latest
+```
+
+Then run:
+
+```bash
+repoxray version
+repoxray scan .
+```
+
 ### From Source
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/repoxray.git
+   git clone https://github.com/realknove/repoxray.git
    cd repoxray
    ```
 
@@ -79,6 +92,7 @@ Other commands:
 ```bash
 repoxray version     # Print version
 repoxray help        # Print help
+repoxray scan --help # Print scan options
 ```
 
 ## Development
@@ -230,13 +244,11 @@ More examples are available in:
 
 ## Roadmap
 
-- [ ] Add more detailed checks (e.g., code quality metrics)
-- [x] Support for multiple output formats (text, JSON, Markdown)
-- [ ] HTML report output
-- [ ] Integration with GitHub API for additional metrics
-- [ ] Web interface for repository analysis
-- [ ] Plugin system for custom checks
-- [ ] Support for non-Git repositories
+- [ ] GitHub API integration
+- [ ] Dependency risk analysis
+- [ ] Maintainer responsiveness
+- [ ] Badge generation
+- [ ] Repo comparison
 
 ## Contributing
 

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 // CheckWorkflowPermissions checks whether workflow files define permissions.

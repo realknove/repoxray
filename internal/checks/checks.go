@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 // DefaultChecks returns the standard repository diagnostics.

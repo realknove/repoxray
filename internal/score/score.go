@@ -1,7 +1,7 @@
 package score
 
 import (
-	"repoxray/internal/types"
+	"github.com/realknove/repoxray/internal/types"
 )
 
 type Analysis struct {

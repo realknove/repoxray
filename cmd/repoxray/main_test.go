@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"repoxray/internal/report"
+	"github.com/realknove/repoxray/internal/report"
 )
 
 func TestParseGitHubRepo(t *testing.T) {
@@ -87,6 +87,27 @@ func TestParseGitHubRepo(t *testing.T) {
 			}
 			if got.Owner != tt.wantOwner || got.Name != tt.wantRepo {
 				t.Fatalf("parseGitHubRepo(%q) = %s/%s, want %s/%s", tt.input, got.Owner, got.Name, tt.wantOwner, tt.wantRepo)
+			}
+		})
+	}
+}
+
+func TestIsHelpArg(t *testing.T) {
+	tests := []struct {
+		arg  string
+		want bool
+	}{
+		{"-h", true},
+		{"--help", true},
+		{"help", false},
+		{"", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.arg, func(t *testing.T) {
+			got := isHelpArg(tt.arg)
+			if got != tt.want {
+				t.Fatalf("isHelpArg(%q) = %v, want %v", tt.arg, got, tt.want)
 			}
 		})
 	}
